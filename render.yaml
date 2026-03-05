@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: wa-pdf-bot
+    runtime: python
+    buildCommand: |
+      pip install -r requirements.txt
+      apt-get update && apt-get install -y \
+        libreoffice \
+        libreoffice-writer \
+        libreoffice-impress \
+        default-jre \
+        fonts-noto \
+        fonts-noto-core \
+        fonts-noto-extra \
+        fonts-indic \
+        fonts-deva \
+        fonts-lohit-deva \
+        fonts-samyak-deva \
+        git \
+        fontconfig
+      mkdir -p /usr/share/fonts/truetype/krutidev
+      git clone --depth=1 https://github.com/Narenbairagi11/krutidev /tmp/krutidev
+      cp /tmp/krutidev/*.TTF /usr/share/fonts/truetype/krutidev/ || true
+      cp /tmp/krutidev/*.ttf /usr/share/fonts/truetype/krutidev/ || true
+      fc-cache -f -v
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    plan: free
+    envVars:
+      - key: WA_TOKEN
+        sync: false
+      - key: WA_PHONE_ID
+        sync: false
+      - key: VERIFY_TOKEN
+        sync: false
