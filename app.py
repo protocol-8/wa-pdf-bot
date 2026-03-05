@@ -15,7 +15,7 @@ app = Flask(__name__)
 # ── Env vars (set these on Railway) ─────────────────────────────────────────
 WA_TOKEN        = os.environ.get("WA_TOKEN")           # Meta permanent access token
 WA_PHONE_ID     = os.environ.get("WA_PHONE_ID")        # WhatsApp Phone Number ID
-VERIFY_TOKEN    = os.environ.get("VERIFY_TOKEN", "myverifytoken123")  # any string you choose
+VERIFY_TOKEN    = os.environ.get("VERIFY_TOKEN")  # any string you choose
 
 API_URL = f"https://graph.facebook.com/v19.0/{WA_PHONE_ID}"
 SUPPORTED = {".docx", ".doc", ".pptx", ".ppt"}
