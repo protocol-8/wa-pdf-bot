@@ -15,7 +15,7 @@ app = Flask(__name__)
 # ── Env vars (set these on Railway) ─────────────────────────────────────────
 WA_TOKEN        = os.environ.get("WA_TOKEN")           # Meta permanent access token
 WA_PHONE_ID     = os.environ.get("WA_PHONE_ID")        # WhatsApp Phone Number ID
-VERIFY_TOKEN    = os.environ.get("VERIFY_TOKEN")  # any string you choose
+VERIFY_TOKEN    = os.environ.get("VERIFY_TOKEN", "myverifytoken123")  # any string you choose
 
 API_URL = f"https://graph.facebook.com/v19.0/{WA_PHONE_ID}"
 SUPPORTED = {".docx", ".doc", ".pptx", ".ppt"}
@@ -95,18 +95,31 @@ def download_wa_file(media_id: str, dest_path: str) -> bool:
 # ── Convert file to PDF using LibreOffice ────────────────────────────────────
 def convert_to_pdf(input_path: str, output_dir: str) -> str | None:
     try:
+        # Check if libreoffice is available
+        check = subprocess.run(["which", "libreoffice"], capture_output=True, text=True)
+        print(f"[DEBUG] LibreOffice path: {check.stdout.strip() or 'NOT FOUND'}")
+
         result = subprocess.run(
             ["libreoffice", "--headless", "--convert-to", "pdf", "--outdir", output_dir, input_path],
             capture_output=True, text=True, timeout=120,
         )
+        print(f"[DEBUG] LibreOffice stdout: {result.stdout.strip()}")
+        print(f"[DEBUG] LibreOffice stderr: {result.stderr.strip()}")
+        print(f"[DEBUG] Return code: {result.returncode}")
+        print(f"[DEBUG] Output dir contents: {os.listdir(output_dir)}")
+
         if result.returncode == 0:
             pdf_path = os.path.join(output_dir, Path(input_path).stem + ".pdf")
             if os.path.exists(pdf_path):
                 return pdf_path
-        print(f"[ERROR] LibreOffice: {result.stderr}")
+            print(f"[ERROR] PDF not found at expected path: {pdf_path}")
+        print(f"[ERROR] LibreOffice failed: {result.stderr}")
         return None
     except subprocess.TimeoutExpired:
         print("[ERROR] Conversion timed out")
+        return None
+    except FileNotFoundError:
+        print("[ERROR] LibreOffice not installed on this machine!")
         return None
     except Exception as e:
         print(f"[ERROR] {e}")
