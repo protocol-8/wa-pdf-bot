@@ -1,2 +1,26 @@
 [phases.setup]
-aptPkgs = ["libreoffice", "libreoffice-writer", "libreoffice-impress", "default-jre"]
+aptPkgs = [
+  "libreoffice",
+  "libreoffice-writer",
+  "libreoffice-impress",
+  "default-jre",
+  "fonts-noto",
+  "fonts-noto-core",
+  "fonts-noto-extra",
+  "fonts-indic",
+  "fonts-deva",
+  "fonts-lohit-deva",
+  "fonts-samyak-deva",
+  "wget",
+  "git",
+  "fontconfig"
+]
+
+[phases.build]
+cmds = [
+  "mkdir -p /usr/share/fonts/truetype/krutidev",
+  "git clone --depth=1 https://github.com/Narenbairagi11/krutidev /tmp/krutidev",
+  "cp /tmp/krutidev/*.TTF /usr/share/fonts/truetype/krutidev/ || true",
+  "cp /tmp/krutidev/*.ttf /usr/share/fonts/truetype/krutidev/ || true",
+  "fc-cache -f -v"
+]
